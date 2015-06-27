@@ -25,6 +25,35 @@ val parse  =
           | ast (_ :: xs) = ast xs
     in #1 o ast o explode end
 
+fun interpret commands =
+  let val arr = Array.array (30000, 0);
+      fun interpret' [] dp = dp
+        | interpret' (Right :: xs) dp = interpret' xs (dp + 1)
+        | interpret' (Left :: xs) dp = interpret' xs (dp - 1)
+        | interpret' (Inc :: xs) dp =
+          (Array.update (arr, dp, (Array.sub (arr, dp) + 1));
+           interpret' xs dp)
+        | interpret' (Dec :: xs) dp =
+          (Array.update (arr, dp, (Array.sub (arr, dp) - 1));
+           interpret' xs dp)
+        | interpret' (Output :: xs) dp =
+          (print (str (chr (Array.sub (arr, dp))));
+           interpret' xs dp)
+        | interpret' (Loop xs' :: xs) dp =
+          if Array.sub (arr, dp) = 0 then
+              interpret' xs dp
+          else
+              let val dp = interpret' xs' dp;
+              in if Array.sub (arr, dp) <> 0 then
+                     interpret' (Loop xs' :: xs) dp
+                 else
+                     interpret' xs dp
+              end
+        | interpret' _ _ = raise Fail "unimplemented"
+  in
+      interpret' commands 0
+  end
+
 fun main () = ();
 
 val _ = main ();
