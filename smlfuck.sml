@@ -58,6 +58,11 @@ fun interpret commands =
       interpret' commands 0
   end
 
-fun main () = ();
+fun main () =
+  case CommandLine.arguments () of
+      [fileName] => let val is = TextIO.openIn fileName
+                        val src = TextIO.inputAll is
+                    in (interpret (parse src); ()) end
+    | _ => print ("usage: " ^ CommandLine.name () ^ " FILE\n")
 
 val _ = main ();
