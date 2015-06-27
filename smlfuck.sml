@@ -1,3 +1,5 @@
+val ARRAY_SIZE = 30000;
+
 datatype ast = Right
              | Left
              | Inc
@@ -26,10 +28,16 @@ val parse  =
     in #1 o ast o explode end
 
 fun interpret commands =
-  let val arr = Array.array (30000, 0);
+  let val arr = Array.array (ARRAY_SIZE, 0);
       fun interpret' [] dp = dp
-        | interpret' (Right :: xs) dp = interpret' xs (dp + 1)
-        | interpret' (Left :: xs) dp = interpret' xs (dp - 1)
+        | interpret' (Right :: xs) dp = if dp < ARRAY_SIZE - 1 then
+                                            interpret' xs (dp + 1)
+                                        else
+                                            interpret' xs dp
+        | interpret' (Left :: xs) dp = if dp > 0 then
+                                           interpret' xs (dp - 1)
+                                       else
+                                           interpret' xs dp
         | interpret' (Inc :: xs) dp =
           (Array.update (arr, dp, (Array.sub (arr, dp) + 1));
            interpret' xs dp)
