@@ -8,8 +8,6 @@ datatype ast = Right
              | Input
              | Loop of ast list
 
-val tokens = [#"<", #">", #"+", #"-", #".", #",", #"[", #"]"];
-
 val parse  =
     let infix >>=;
         fun x >>= (xs, rest) = (x :: xs, rest);
