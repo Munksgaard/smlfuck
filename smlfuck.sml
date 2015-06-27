@@ -49,7 +49,11 @@ fun interpret commands =
                  else
                      interpret' xs dp
               end
-        | interpret' _ _ = raise Fail "unimplemented"
+        | interpret' (Input :: xs) dp =
+          (case TextIO.input1 TextIO.stdIn of
+              SOME c => Array.update (arr, dp, ord c)
+            | NONE => ();
+           interpret' xs dp)
   in
       interpret' commands 0
   end
